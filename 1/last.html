@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <title>Barışaq?</title>
+  <style>
+    /* Global üslub */
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #e0bbff, #d8b2f8);
+      font-family: 'Segoe UI', sans-serif;
+      color: #4b0082;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      overflow: hidden;
+    }
+    .giris {
+      max-width: 800px;
+      font-size: 1.3rem;
+      margin-bottom: 40px;
+      padding: 0 20px;
+      z-index: 2;
+    }
+    .buttons {
+      display: flex;
+      gap: 20px;
+      z-index: 2;
+    }
+    button {
+      padding: 15px 25px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.5s ease, font-size 0.5s ease;
+    }
+    #yes {
+      background-color: #a64dff;
+      color: white;
+      z-index: 2;
+      transform-origin: center center;
+    }
+    #no {
+      background-color: #f4e1ff;
+      color: #8b00b0;
+      z-index: 2;
+      transform-origin: center center;
+    }
+    /* Tam ekranlı şeir bölməsi – əvvəlki üslub qorunur */
+    .poem {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow-y: auto;
+      background: #f7e9ff;
+      color: inherit;
+      font-size: 1.4rem;
+      padding: 40px;
+      box-sizing: border-box;
+      z-index: 10;
+    }
+    /* Ürək animasiyaları üçün konteyner */
+    .hearts {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .heart {
+      position: absolute;
+      color: #ff69b4;
+      font-size: 2rem;
+      animation: float 4s linear infinite;
+    }
+    @keyframes float {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    .fade-in {
+      animation: fadeIn 1s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Giriş mətni -->
+  <div class="giris fade-in" id="intro">
+    <p>
+      Həyatım, bebişimm, hərşeyimm,<br>
+      Yaşanan durumlar ikimiz üçün də qəlb qırıcı oldu,<br>
+      Amma bəlkə də birdə əsla bu məsələni təkrarkamamaq üçün səbəb olar,<br>
+      Sevginə sığınaraq sualı verirəm:<br>
+      <strong>Barışaq?</strong> 💜
+    </p>
+  </div>
+  <!-- Seçim düymələri -->
+  <div class="buttons fade-in" id="options">
+    <button id="yes">Bal Bəbəm 💖</button>
+    <button id="no">VIZQIRT 🙃</button>
+  </div>
+  <!-- Şeir bölməsi (tam ekran) -->
+  <div class="poem fade-in" id="poem">
+    <p>
+      Mən Dilbəri sordum gəlib-gədəndən;<br>
+      Dədilər, barışmaz, küsmüşdür səndən.<br>
+      Mən iltifat etdiym, o qaçdı məndən,<br>
+      Qaçqın ədasına qurban olduğum.<br><br>
+      O mənim sevgilim, o mənim anam.<br>
+      Onsuz üzüm gülməz, açılmaz aynam.<br>
+      Bilməm, harda qaldı o nazlı durnam,<br>
+      O xoş sədasına qurban olduğum.<br><br>
+      Ayrılıq oduna könül dayanmaz.<br>
+      Eşq oduna yanan bir daha yanmaz.<br>
+      Çəkdiyim nalədən nəçin oyanmaz,<br>
+      Şirin röyasına qurban olduğum?
+    </p>
+  </div>
+  
+  <!-- Ürək animasiyaları üçün konteyner -->
+  <div class="hearts" id="hearts"></div>
+  
+  <!-- Audio elementi – "music/mikail.mp3" faylı, gizlidir -->
+  <audio id="musfiq-audio" src="music/mikail.mp3" preload="auto" style="display: none;"></audio>
+  
+  <script>
+    const yesBtn = document.getElementById('yes');
+    const noBtn = document.getElementById('no');
+    const poem = document.getElementById('poem');
+    const heartsContainer = document.getElementById('hearts');
+    const intro = document.getElementById('intro');
+    const options = document.getElementById('options');
+    const audio = document.getElementById('musfiq-audio');
+    
+    // Səs səviyyəsini maksimuma gətiririk
+    audio.volume = 1.0;
+    
+    let noClickCount = 0;
+    let yesClicked = false;
+    
+    noBtn.addEventListener('click', () => {
+      if (yesClicked) return;
+      noClickCount++;
+      
+      // "Bal Bəbəm" düyməsi böyüyür, "VIZQIRT" düyməsi kiçilir
+      let yesScale = 1 + noClickCount * 4;
+      let noScale = Math.max(1 - noClickCount * 0.15, 0.3);
+      
+      yesBtn.style.transform = `scale(${yesScale})`;
+      noBtn.style.transform = `scale(${noScale})`;
+      
+      if (yesScale >= 30) {
+        yesClicked = true;
+        yesBtn.style.fontSize = '4rem';
+        yesBtn.innerText = 'BAL BƏBƏM ❤️❤️❤️';
+        noBtn.style.pointerEvents = 'none';
+        noBtn.style.opacity = '0.5';
+      }
+    });
+    
+    yesBtn.addEventListener('click', () => {
+      if (!yesClicked) return;
+      
+      // Şeir bölməsi tam ekran olaraq göstərilir, giriş və düymələr gizlənir
+      poem.style.display = 'block';
+      intro.style.display = 'none';
+      options.style.display = 'none';
+      
+      createHearts();
+      
+      // İstifadəçi klikliyi olduğundan musiqi çalır
+      audio.play().catch(err => console.log("Musiqi çalma problemi:", err));
+    });
+    
+    function createHearts() {
+      for (let i = 0; i < 50; i++) {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.top = Math.random() * 100 + 'vh';
+        heart.textContent = '💜';
+        heartsContainer.appendChild(heart);
+        setTimeout(() => heart.remove(), 4000);
+      }
+    }
+  </script>
+</body>
+</html>
